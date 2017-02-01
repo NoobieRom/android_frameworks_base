@@ -344,28 +344,29 @@ public class WifiTracker {
                     continue;
                 }
                 AccessPoint accessPoint = getCachedOrCreate(config, cachedAccessPoints);
+<<<<<<< HEAD
 
                 accessPoint.update(connectionConfig, mLastInfo, mLastNetworkInfo);
 
+=======
+                if (mLastInfo != null && mLastNetworkInfo != null) {
+                    accessPoint.update(connectionConfig, mLastInfo, mLastNetworkInfo);
+                }
+>>>>>>> 79a993f... SettingsLib: wifi: Fixed AccessPoint tracking for Passpoint networks
                 if (mIncludeSaved) {
-                    if (!config.isPasspoint() || mIncludePasspoints) {
-                        // If saved network not present in scan result then set its Rssi to MAX_VALUE
-                        boolean apFound = false;
-                        for (ScanResult result : results) {
-                            if (result.SSID.equals(accessPoint.getSsidStr())) {
-                                apFound = true;
-                                break;
-                            }
+                    // If saved network not present in scan result then set its Rssi to MAX_VALUE
+                    boolean apFound = false;
+                    for (ScanResult result : results) {
+                        if (result.SSID.equals(accessPoint.getSsidStr())) {
+                            apFound = true;
+                            break;
                         }
-                        if (!apFound) {
-                            accessPoint.setRssi(Integer.MAX_VALUE);
-                        }
-                        accessPoints.add(accessPoint);
                     }
-
-                    if (config.isPasspoint() == false) {
-                        apMap.put(accessPoint.getSsidStr(), accessPoint);
+                    if (!apFound) {
+                        accessPoint.setRssi(Integer.MAX_VALUE);
                     }
+                    accessPoints.add(accessPoint);
+                    apMap.put(accessPoint.getSsidStr(), accessPoint);
                 } else {
                     // If we aren't using saved networks, drop them into the cache so that
                     // we have access to their saved info.
@@ -401,17 +402,11 @@ public class WifiTracker {
                         // the given ScanResult.  This is used for showing that a given AP
                         // (ScanResult) is available via a Passpoint provider (provider friendly
                         // name).
-                        try {
-                            WifiConfiguration config = mWifiManager.getMatchingWifiConfig(result);
-                            if (config != null) {
-                                accessPoint.update(config);
-                            }
-                        } catch (UnsupportedOperationException e) {
-                            // Passpoint not supported on the device.
-
+                        WifiConfiguration config = mWifiManager.getMatchingWifiConfig(result);
+                        if (config != null) {
+                            accessPoint.update(config);
                         }
                     }
-
                     accessPoints.add(accessPoint);
                     apMap.put(accessPoint.getSsidStr(), accessPoint);
                 }
