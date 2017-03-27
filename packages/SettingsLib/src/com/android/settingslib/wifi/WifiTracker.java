@@ -396,18 +396,20 @@ public class WifiTracker {
                     }
 
                     if (result.isPasspointNetwork()) {
-                        WifiConfiguration config = mWifiManager.getMatchingWifiConfig(result);
-                        if (config != null) {
-                            accessPoint.update(config);
-                        }
-                    }
 
-                    if (mLastInfo != null && mLastInfo.getBSSID() != null
-                            && mLastInfo.getBSSID().equals(result.BSSID)
-                            && connectionConfig != null && connectionConfig.isPasspoint()) {
-                        /* This network is connected via this passpoint config */
-                        /* SSID match is not going to work for it; so update explicitly */
-                        accessPoint.update(connectionConfig);
+                        // Retrieve a WifiConfiguration for a Passpoint provider that matches
+                        // the given ScanResult.  This is used for showing that a given AP
+                        // (ScanResult) is available via a Passpoint provider (provider friendly
+                        // name).
+                        try {
+                            WifiConfiguration config = mWifiManager.getMatchingWifiConfig(result);
+                            if (config != null) {
+                                accessPoint.update(config);
+                            }
+                        } catch (UnsupportedOperationException e) {
+                            // Passpoint not supported on the device.
+
+                        }
                     }
 
                     accessPoints.add(accessPoint);
